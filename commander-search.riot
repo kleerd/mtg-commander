@@ -1,10 +1,20 @@
 <commander-search>
-  <button type="button" onclick="{ click }">Search</button>
-  <div each="{ commanderSet in state.commanderSets}">
-    <h2>{ commanderSet.set } ({ commanderSet.cards.length })</h2>
-    <span each="{ card in commanderSet.cards}">
-      <img src="{ card.imageUrl }" alt="{ card.name }" hspace=2></img>
-    </span>
+  <div class="columns">
+    <div class="column">
+      <button class="button is-primary" type="button" onclick="{ click }">Search</button>
+    </div>
+  </div>
+  <div each="{ commanderSet in state.commanderSets }">
+    <div class="columns">
+      <div class="column">
+        <h4 class="title is-4">{ commanderSet.set } ({ commanderSet.cards.length })</h4>
+      </div>
+    </div>
+    <div class="columns is-multiline">
+      <div class="column is-one-quarter-desktop is-half-tablet" each="{ card in commanderSet.cards }">
+        <img src="{ card.imageUrl }" alt="{ card.name }">
+      </div>
+    </div>
   </div>
   <script>
     function commanderQuery(set) {
