@@ -1,0 +1,57 @@
+<commander-search>
+  <button type="button" onclick="{ click }">Search</button>
+  <div each="{ commanderSet in state.commanderSets}">
+    <h2>{ commanderSet.set } ({ commanderSet.cards.length })</h2>
+    <span each="{ card in commanderSet.cards}">
+      <img src="{ card.imageUrl }" alt="{ card.name }" hspace=2></img>
+    </span>
+  </div>
+  <script>
+    function commanderQuery(set) {
+      return "https://api.magicthegathering.io/v1/cards?types=Planeswalker|Creature&supertypes=Legendary&set=" + set;
+    }
+    function localizedCards(rawCards, lang) {
+      return rawCards.map(c => {
+        const jp = c.foreignNames.find(f => f.language == lang);
+        if (jp) {
+          c.name = jp.name;
+          c.imageUrl = jp.imageUrl;
+        }
+        return c;
+      }).filter(c => c.imageUrl);
+    }
+    export default {
+      onBeforeMount(state, props) {
+        this.props = {
+          standards: ['ELD','M20','WAR','RNA','GRN'],
+        };
+        this.state = {
+          commanderSets: [],
+        };
+      },
+      click(e) {
+        try {
+          this.props.standards.forEach(set => {
+            fetch(commanderQuery(set))
+            .then(response => response.json())
+            .then(json => {
+              // console.log(json);
+              const cards = localizedCards(json.cards, "Japanese");
+              this.state.commanderSets.push({
+                'set': set,
+                'cards': cards
+              });
+              this.update({
+                'commanderSets': this.state.commanderSets,
+              });
+            });
+          })
+        } catch (error) {
+          this.update({
+            error: error.message
+          });
+        }
+      }
+    }
+  </script>
+</commander-search>

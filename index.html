@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+  <h1>MTG Brawl Commander Search</h1>
+  <commander-search></commander-search>
+  <script src="./commander-search.riot" type="riot"></script>
+  <script src="//cdn.jsdelivr.net/npm/riot@4.0.0-rc.1/riot+compiler.min.js"></script>
+  <script>
+  (async function main() {
+    await riot.compile()
+    riot.mount('commander-search');
+  }())
+  </script>
+</body>
+</html>

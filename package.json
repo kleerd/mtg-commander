@@ -1,0 +1,19 @@
+{
+  "name": "mtg-commander",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "parcel": "parcel index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "parcel-bundler": "^1.12.4",
+    "riot": "^4.8.2"
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ]  
+}
