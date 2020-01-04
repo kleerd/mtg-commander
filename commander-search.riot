@@ -1,17 +1,26 @@
 <commander-search>
   <div class="columns">
     <div class="column">
-      <button class="button is-primary" type="button" onclick="{ click }">Search</button>
+      <button class="button is-primary" type="button" onclick="{ onSearchClick }">Search</button>
+    </div>
+  </div>
+  <div class="columns">
+    <div class="column">
+      <span class="icon"><i class="ms ms-w ms-cost { state.colors.W ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
+      <span class="icon"><i class="ms ms-u ms-cost { state.colors.U ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
+      <span class="icon"><i class="ms ms-b ms-cost { state.colors.B ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
+      <span class="icon"><i class="ms ms-r ms-cost { state.colors.R ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
+      <span class="icon"><i class="ms ms-g ms-cost { state.colors.G ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
     </div>
   </div>
   <div each="{ commanderSet in state.commanderSets }">
     <div class="columns">
       <div class="column">
-        <h4 class="title is-4">{ commanderSet.set } ({ commanderSet.cards.length })</h4>
+        <h4 class="title is-4">{ commanderSet.set }</h4>
       </div>
     </div>
     <div class="columns is-multiline">
-      <div class="column is-one-quarter-desktop is-half-tablet" each="{ card in commanderSet.cards }">
+      <div class="column is-one-quarter-desktop is-half-tablet { shouldShow(card) ? '' : 'filtered' }" each="{ card in commanderSet.cards }">
         <img src="{ card.imageUrl }" alt="{ card.name }">
       </div>
     </div>
@@ -37,9 +46,10 @@
         };
         this.state = {
           commanderSets: [],
+          colors: {'W':true,'U':true,'B':true,'R':true,'G':true},
         };
       },
-      click(e) {
+      onSearchClick(e) {
         try {
           this.props.standards.forEach(set => {
             fetch(commanderQuery(set))
@@ -61,6 +71,22 @@
             error: error.message
           });
         }
+      },
+      onManaClick(e) {
+        var ms;
+        if (e.target.className.includes('ms-w')) { ms = 'W'; }
+        else if (e.target.className.includes('ms-u')) { ms = 'U'; }
+        else if (e.target.className.includes('ms-b')) { ms = 'B'; }
+        else if (e.target.className.includes('ms-r')) { ms = 'R'; }
+        else if (e.target.className.includes('ms-g')) { ms = 'G'; }
+        else { return; }
+
+        this.state.colors[ms] = ! this.state.colors[ms];
+        this.update({ 'colors': this.state.colors });
+      },
+      shouldShow(card) {
+        const intersects = card.colorIdentity.filter(c => this.state.colors[c]);
+        return intersects.length > 0;
       }
     }
   </script>

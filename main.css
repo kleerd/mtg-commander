@@ -1,0 +1,7 @@
+i.filtered {
+  opacity: 0.5;
+}
+
+div.filtered {
+  display: none;
+}
