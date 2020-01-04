@@ -6,11 +6,11 @@
   </div>
   <div class="columns">
     <div class="column">
-      <span class="icon"><i class="ms ms-w ms-cost { state.colors.W ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
-      <span class="icon"><i class="ms ms-u ms-cost { state.colors.U ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
       <span class="icon"><i class="ms ms-b ms-cost { state.colors.B ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
-      <span class="icon"><i class="ms ms-r ms-cost { state.colors.R ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
       <span class="icon"><i class="ms ms-g ms-cost { state.colors.G ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
+      <span class="icon"><i class="ms ms-r ms-cost { state.colors.R ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
+      <span class="icon"><i class="ms ms-u ms-cost { state.colors.U ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>      
+      <span class="icon"><i class="ms ms-w ms-cost { state.colors.W ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
     </div>
   </div>
   <div each="{ commanderSet in state.commanderSets }">
@@ -27,7 +27,7 @@
   </div>
   <script>
     function commanderQuery(set) {
-      return "https://api.magicthegathering.io/v1/cards?types=Planeswalker|Creature&supertypes=Legendary&set=" + set;
+      return "https://api.magicthegathering.io/v1/cards?types=Planeswalker|Creature&supertypes=Legendary&orderBy=colorIdentity&set=" + set;
     }
     function localizedCards(rawCards, lang) {
       return rawCards.map(c => {
@@ -38,6 +38,11 @@
         }
         return c;
       }).filter(c => c.imageUrl);
+    }
+    function sortCommanders(cards) {
+      var planeswalkers = cards.filter(c => c.types.includes('Planeswalker'));
+      var creatures = cards.filter(c => c.types.includes('Creature'));
+      return planeswalkers.concat(creatures);
     }
     export default {
       onBeforeMount(state, props) {
@@ -51,15 +56,16 @@
       },
       onSearchClick(e) {
         try {
-          this.props.standards.forEach(set => {
+          this.state.commanderSets = [];
+          this.props.standards.forEach((set, index, _) => {
             fetch(commanderQuery(set))
             .then(response => response.json())
             .then(json => {
               // console.log(json);
               const cards = localizedCards(json.cards, "Japanese");
-              this.state.commanderSets.push({
+              this.state.commanderSets.splice(index, 0, {
                 'set': set,
-                'cards': cards
+                'cards': sortCommanders(cards)
               });
               this.update({
                 'commanderSets': this.state.commanderSets,
