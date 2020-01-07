@@ -13,6 +13,14 @@
       <span class="icon"><i class="ms ms-w ms-cost { state.colors.W ? '' : 'filtered' }" onclick="{ onManaClick }"></i></span>
     </div>
   </div>
+  <div class="columns">
+    <div class="column">
+      <div class="buttons are-small has-addons">
+        <button class="button { isAndFilter() ? '' : 'is-info is-selected' }" onclick="{ onOrButtonClick }">OR</button>
+        <button class="button { isAndFilter() ? 'is-info is-selected' : '' }" onclick="{ onAndButtonClick }">AND</button>
+      </div>
+    </div>
+  </div>
   <div each="{ commanderSet in state.commanderSets }">
     <div class="columns">
       <div class="column">
@@ -52,6 +60,7 @@
         this.state = {
           commanderSets: [],
           colors: {'W':true,'U':true,'B':true,'R':true,'G':true},
+          isAndFilter: false,
         };
       },
       onSearchClick(e) {
@@ -90,9 +99,28 @@
         this.state.colors[ms] = ! this.state.colors[ms];
         this.update({ 'colors': this.state.colors });
       },
+      onOrButtonClick(e) {
+        this.state.isAndFilter = false;
+        this.update({ 'isAndFilter': this.state.isAndFilter });
+      },
+      onAndButtonClick(e) {
+        this.state.isAndFilter = true;
+        this.update({ 'isAndFilter': this.state.isAndFilter });
+      },      
+      isAndFilter() {
+        return this.state.isAndFilter;
+      },
       shouldShow(card) {
-        const intersects = card.colorIdentity.filter(c => this.state.colors[c]);
-        return intersects.length > 0;
+        const enabledColors = Object.keys(this.state.colors).filter(c => this.state.colors[c]);
+        if (enabledColors.length == 0) {
+          return false;
+        }
+        const includesColors = enabledColors.filter(c => card.colorIdentity.includes(c));
+        if (this.state.isAndFilter) {
+          return includesColors.length == enabledColors.length;
+        } else {
+          return includesColors.length > 0;
+        }       
       }
     }
   </script>
