@@ -51,16 +51,17 @@
       },
       onSearchClick(e) {
         try {
-          this.state.commanderSets = [];
+          this.state.commanderSets = this.props.standards.map(function(element) {
+            return { 'set': element, 'cards': [] };
+          });
           this.props.standards.forEach((set, index, _) => {
             fetch(commanderQuery(set))
             .then(response => response.json())
             .then(json => {
               // console.log(json);
-              this.state.commanderSets.splice(index, 0, {
-                'set': set,
-                'cards': json.data
-              });
+              this.state.commanderSets.filter(function(element) {
+                return element.set == set;
+              })[0].cards = json.data;
               this.update({
                 'commanderSets': this.state.commanderSets,
               });
