@@ -29,28 +29,14 @@
     </div>
     <div class="columns is-multiline">
       <div class="column is-one-quarter-desktop is-half-tablet { shouldShow(card) ? '' : 'filtered' }" each="{ card in commanderSet.cards }">
-        <img src="{ card.imageUrl }" alt="{ card.name }">
+        <img src="{ card.image_uris.normal }" alt="{ card.printed_name }">
       </div>
     </div>
   </div>
   <script>
     function commanderQuery(set) {
-      return "https://api.magicthegathering.io/v1/cards?types=Planeswalker|Creature&supertypes=Legendary&orderBy=colorIdentity&set=" + set;
-    }
-    function localizedCards(rawCards, lang) {
-      return rawCards.map(c => {
-        const jp = c.foreignNames.find(f => f.language == lang);
-        if (jp) {
-          c.name = jp.name;
-          c.imageUrl = jp.imageUrl;
-        }
-        return c;
-      }).filter(c => c.imageUrl);
-    }
-    function sortCommanders(cards) {
-      var planeswalkers = cards.filter(c => c.types.includes('Planeswalker'));
-      var creatures = cards.filter(c => c.types.includes('Creature'));
-      return planeswalkers.concat(creatures);
+      const q = encodeURI("t:legend (t:planeswalker or t:creature) lang:jp set:" + set);
+      return "https://api.scryfall.com/cards/search?q=" + q + "&order=color";
     }
     export default {
       onBeforeMount(state, props) {
@@ -71,10 +57,9 @@
             .then(response => response.json())
             .then(json => {
               // console.log(json);
-              const cards = localizedCards(json.cards, "Japanese");
               this.state.commanderSets.splice(index, 0, {
                 'set': set,
-                'cards': sortCommanders(cards)
+                'cards': json.data
               });
               this.update({
                 'commanderSets': this.state.commanderSets,
@@ -115,7 +100,7 @@
         if (enabledColors.length == 0) {
           return false;
         }
-        const includesColors = enabledColors.filter(c => card.colorIdentity.includes(c));
+        const includesColors = enabledColors.filter(c => card.color_identity.includes(c));
         if (this.state.isAndFilter) {
           return includesColors.length == enabledColors.length;
         } else {
